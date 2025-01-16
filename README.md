@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/stwch/stwch/refs/heads/main/feature-top.jpg" />
+
 # GBFHelper
 
 グランブルーファンタジーの攻略サイトです。<br />
@@ -7,10 +9,4 @@
 ## ライセンス
 
 このリポジトリはポートフォリオのために公開しています。<br />
-ソースコードの改変、コピーは許可されません。
-
-## 機能
-
-<br />
-
-### コンテンツチャート
+編集目的のコピーはしないでください。
