@@ -1,0 +1,33 @@
+---
+import type { SettingTypeName } from 'src/assets/data/common';
+import ElementChangeTargetImageReact from 'src/components/contents-chart/internal/ElementChangeTargetImageReact';
+import MultiplyTargetImageReact from 'src/components/contents-chart/internal/MultiplyTargetImageReact';
+import type { TreasuresData } from 'src/helpers/createContentsData';
+
+interface Props extends React.ComponentPropsWithoutRef<'img'> {
+  settingTypeName?: SettingTypeName;
+  targets: TreasuresData;
+}
+const { className, targets, settingTypeName } = Astro.props;
+const isElementChange = settingTypeName === 'element_change';
+const isMultiply = settingTypeName === 'multiply';
+---
+
+{
+  isElementChange && (
+    <ElementChangeTargetImageReact
+      client:only="react"
+      className={className}
+      targets={targets}
+    />
+  )
+}
+{
+  isMultiply && (
+    <MultiplyTargetImageReact
+      client:only="react"
+      targets={targets}
+      className={className}
+    />
+  )
+}

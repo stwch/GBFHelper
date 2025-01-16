@@ -1,0 +1,37 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { css } from 'styled-system/css';
+
+interface Props extends HTMLAttributes<'h2'> {
+  text: string;
+  objectRow?: boolean;
+}
+const { class: className, text, objectRow } = Astro.props;
+---
+
+<h2
+  class:list={[
+    className,
+    css({
+      fontWeight: '700',
+      mb: objectRow ? '{spacing.row.title.object}' : '{spacing.row.title}',
+      d: 'grid',
+      gridTemplateColumns: 'auto auto',
+      alignItems: 'start',
+      justifyContent: 'start',
+      columnGap: '.375rem',
+      pos: 'relative',
+      '&::before': {
+        //アイコン
+        content: '""',
+        d: 'block',
+        w: '.625rem',
+        h: '1rem',
+        mt: '.25rem',
+        bgColor: '{colors.text}',
+        clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)'
+      }
+    })
+  ]}>
+  {text}
+</h2>

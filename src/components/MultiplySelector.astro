@@ -1,0 +1,115 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { css } from 'styled-system/css';
+import type { SystemStyleObject } from 'styled-system/types';
+
+interface Props extends HTMLAttributes<'button'> {}
+const { class: className } = Astro.props;
+
+const options = Array(11).fill(0);
+const optionStyles: SystemStyleObject = {
+  d: 'block',
+  w: '100%',
+  pd: '.25rem',
+  '& + &': {
+    bt: '1px solid {colors.fire}'
+  },
+  '&:hover': {
+    bgColor: '{colors.fire}',
+    color: '{colors.gray}'
+  }
+};
+---
+
+<div
+  data-multiply-selector
+  class:list={[className, css({ pos: 'relative' })]}>
+  <button
+    data-multipy-select
+    type="button"
+    class:list={[
+      css({
+        d: 'grid',
+        gridTemplateRows: 'auto auto',
+        bo: '1px solid {colors.fire}',
+        bgColor: '{colors.gray}',
+        radius: '4px',
+        filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, .4)) drop-shadow(2px 2px 2px rgba(0, 0, 0, .2))',
+        '&::before': {
+          content: '""',
+          d: 'block',
+          bgImage: 'url(/images/bg-pattern-dark-one.png)',
+          opacity: '0.15',
+          bgSize: 'cover',
+          bgPos: 'center',
+          pos: 'absolute',
+          inset: 0,
+          zIndex: '-1'
+        },
+        '&::after': {
+          content: '""',
+          d: 'block',
+          w: '1rem',
+          h: '.75rem',
+          radius: '4px',
+          bgColor: 'currentcolor',
+          clipPath: 'polygon(50% 100%, 0 0, 100% 0)',
+          mx: 'auto',
+          mb: '.5rem'
+        }
+      })
+    ]}>
+    <span
+      class={css({
+        d: 'grid',
+        placeItems: 'center',
+        aspectRatio: '1/1',
+        mg: '.375rem',
+        radius: '100px',
+        bgColor: '{colors.fire}',
+        color: '{colors.gray}',
+        fontWeight: '900',
+        bb: '1px solid {colors.fire}'
+      })}>
+      2
+    </span>
+  </button>
+  <div
+    data-multiply-option-body
+    class={css({
+      w: '100%',
+      bo: '1px solid {colors.fire}',
+      bgColor: '{colors.gray}',
+      fontWeight: '700',
+      textAlign: 'center',
+      lineHeight: 1,
+      pos: 'absolute',
+      top: '100%',
+      left: 0,
+      d: 'none',
+      '&[data-open]': { d: 'block' }
+    })}>
+    {
+      options.map((_, i) => {
+        return (
+          <button
+            data-multiply-option
+            type="button"
+            class={css(optionStyles)}>
+            {i}
+          </button>
+        );
+      })
+    }
+  </div>
+</div>
+
+<script>
+  const selectorDOMs = document.querySelectorAll('[data-multiply-selector]');
+
+  selectorDOMs.forEach(selectorDOM => {
+    const optionOpenBtn = selectorDOM.querySelector('[data-multipy-select]');
+    const optionBodyDOM = selectorDOM.querySelector('[data-multiply-option-body]');
+    optionOpenBtn?.addEventListener('click', () => optionBodyDOM?.toggleAttribute('data-open', undefined));
+  });
+</script>

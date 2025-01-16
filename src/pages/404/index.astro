@@ -1,0 +1,88 @@
+---
+import Image from 'astro/components/Image.astro';
+import type { HTMLAttributes } from 'astro/types';
+import SiteTitle from 'src/components/internal/SiteTitle.astro';
+import MainSection from 'src/components/MainSection.astro';
+import PReact from 'src/components/PReact';
+import Layout from 'src/layouts/Layout.astro';
+import { css } from 'styled-system/css';
+
+interface Props extends HTMLAttributes<'div'> {
+  isUnderSection?: boolean;
+}
+const { class: className, isUnderSection } = Astro.props;
+
+const Heading = isUnderSection ? 'h3' : 'h1';
+---
+
+<Layout
+  title="ページが見つかりません｜GBFHelper - グラブル攻略"
+  description="URL が間違っているとこのページが表示されます"
+  is404={true}>
+  <div
+    class:list={[
+      className,
+      css({
+        aspectRatio: '2/1',
+        overflow: 'hidden',
+        bgColor: '{colors.bg}',
+        pos: 'relative',
+        zIndex: '-1',
+        '&::after': {
+          //背景
+          content: '""',
+          d: 'block',
+          pos: 'absolute',
+          left: '-10%',
+          bottom: '-25%',
+          w: '75%',
+          aspectRatio: '759/553',
+          bgImage: 'url(/images/bg-pattern-light-one.png)',
+          bgRepeat: 'no-repeat',
+          bgSize: '100%',
+          filter: 'opacity(6%)',
+        },
+      }),
+    ]}>
+    <Heading
+      class={css({
+        color: '{colors.gray}',
+        pt: '.5rem',
+        pl: '.5rem',
+      })}>
+      <SiteTitle
+        as="span"
+        label="NotFound"
+        class={css({ fontSize: '3rem' })}
+      />
+      <span
+        class={css({
+          d: 'block',
+          fontFamily: 'notoSerifJP, serif',
+          fontWeight: 500,
+          mt: '-0.375rem',
+          pl: '.25rem',
+          filter: 'drop-shadow(1px 1px 2px {colors.text})',
+        })}>
+        ページが存在しません
+      </span>
+    </Heading>
+    <Image
+      class={css({
+        pos: 'absolute',
+        top: '-55%',
+        right: '-20%',
+      })}
+      src="/images/visual/ramuredda.png"
+      alt="ラムレッダ"
+      width={640}
+      height={628}
+    />
+  </div>
+  <MainSection
+    title="入力したURL が間違っているか、変更された可能性があります"
+    redBorder={true}>
+    <PReact>お手数ですが、元のページをGBFHelper から探していただくか、正しいURL を入力してみてください。</PReact>
+    <PReact>Menu から他のページへ移動可能です。</PReact>
+  </MainSection>
+</Layout>

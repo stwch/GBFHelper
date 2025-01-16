@@ -1,0 +1,63 @@
+---
+import type { ComponentProps } from 'astro/types';
+import { Image } from 'astro:assets';
+import FeatureVisual from 'src/components/internal/FeatureVisual.astro';
+import type { FeatureName } from 'src/helpers/createFeatureData';
+import createFeatureData from 'src/helpers/createFeatureData';
+import getAstroImageFunction from 'src/helpers/getAstroImageFunction';
+import { css } from 'styled-system/css';
+
+interface Props extends Omit<ComponentProps<typeof FeatureVisual>, 'title'> {
+  featureName: FeatureName;
+}
+const { class: className, featureName, isUnderSection } = Astro.props;
+if (!featureName) throw Error(`props「featureName」が必須`);
+const feature = createFeatureData(featureName);
+---
+
+<FeatureVisual
+  class:list={[className]}
+  title={feature.title}
+  isUnderSection={isUnderSection}>
+  {
+    featureName === 'top' && (
+      <Image
+        class={css({
+          pos: 'absolute',
+          top: '0%',
+          right: '-30%'
+        })}
+        src={getAstroImageFunction(feature.imagePath)()}
+        alt={feature.alt}
+      />
+    )
+  }
+  {
+    featureName === 'contents_chart' && (
+      <Image
+        class={css({
+          pos: 'absolute',
+          top: '-10%',
+          right: '-30%',
+          transform: 'scale(-1, 1)'
+        })}
+        src={getAstroImageFunction(feature.imagePath)()}
+        alt={feature.alt}
+      />
+    )
+  }
+  <!-- {
+    featureName === 'required_treasure_accu' && (
+      <Image
+        class={css({
+          pos: 'absolute',
+          right: '-50%',
+          scale: '1.5',
+          transform: 'translateY(5%)'
+        })}
+        src={getAstroImageFunction(feature.imagePath)()}
+        alt={feature.alt}
+      />
+    )
+  } -->
+</FeatureVisual>

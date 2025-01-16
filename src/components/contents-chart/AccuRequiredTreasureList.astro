@@ -1,0 +1,52 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import type { SettingTypeName } from 'src/assets/data/common';
+import AccuElementChangeRequiredTreasureListReact from 'src/components/contents-chart/internal/AccuElementChangeRequiredTreasureListReact';
+import AccuMultiplyRequiredTreasureListReact from 'src/components/contents-chart/internal/AccuMultiplyRequiredTreasureListReact';
+import AccuStaticRequiredTreasureList from 'src/components/contents-chart/internal/AccuStaticRequiredTreasureList.astro';
+import type { TreasuresData, TreasureSorts } from 'src/helpers/createContentsData';
+import { css, cx } from 'styled-system/css';
+import type { SystemStyleObject } from 'styled-system/types';
+
+interface Props extends HTMLAttributes<'ul'> {
+  treasures: TreasuresData;
+  treasureSorts: TreasureSorts[string] | undefined;
+  settingTypeName: SettingTypeName;
+}
+const { class: className, treasures, treasureSorts, settingTypeName } = Astro.props;
+const isElementChange = settingTypeName === 'element_change';
+const isMultiply = settingTypeName === 'multiply';
+const marginStyle: SystemStyleObject = { '&+&': { mt: '1rem' } };
+---
+
+<>
+  {
+    isElementChange && (
+      <AccuElementChangeRequiredTreasureListReact
+        client:only="react"
+        className={cx(className, css(marginStyle))}
+        treasures={treasures}
+        treasureSorts={treasureSorts}
+      />
+    )
+  }
+  {
+    isMultiply && (
+      <AccuMultiplyRequiredTreasureListReact
+        client:only="react"
+        className={cx(className, css(marginStyle))}
+        treasures={treasures}
+        treasureSorts={treasureSorts}
+      />
+    )
+  }
+  {
+    !settingTypeName && (
+      <AccuStaticRequiredTreasureList
+        class:list={[className, css(marginStyle)]}
+        treasures={treasures}
+        treasureSorts={treasureSorts}
+      />
+    )
+  }
+</>

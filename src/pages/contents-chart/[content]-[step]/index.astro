@@ -1,0 +1,387 @@
+---
+import type { stepEntries } from 'src/assets/data/common';
+import contentsData from 'src/assets/data/contentsData';
+import InitSettingStore from 'src/components/contents-chart/InitSettingStore.astro';
+import RequiredTreasureModalLabel from 'src/components/contents-chart/internal/RequiredTreasureModalLabel.astro';
+import RequiredTreasureModal from 'src/components/contents-chart/RequiredTreasureModal.astro';
+import RequiredTreasureModalAll from 'src/components/contents-chart/RequiredTreasureModalAll.astro';
+import RequiredTreasureModalBtn from 'src/components/contents-chart/RequiredTreasureModalBtn.astro';
+import RequiredTreasureModalByTags from 'src/components/contents-chart/RequiredTreasureModalByTags.astro';
+import SettingSection from 'src/components/contents-chart/SettingSection.astro';
+import TreasureModalReact from 'src/components/contents-chart/TreasureModalReact';
+import ContentsLabel from 'src/components/ContentsLabel.astro';
+import MainModalBody from 'src/components/internal/MainModalBody.astro';
+import MainSection from 'src/components/MainSection.astro';
+import MainVisual from 'src/components/MainVisual.astro';
+import PReact from 'src/components/PReact';
+import {
+  requiredTagEntries,
+  type ContentData,
+  type RequiredTag,
+  type RequiredTreasureData,
+  type TreasuresData,
+} from 'src/helpers/createContentsData';
+import Layout from 'src/layouts/Layout.astro';
+import { css } from 'styled-system/css';
+
+export function getStaticPaths() {
+  return contentsData.flat().flatMap(data => {
+    const { contents, steps, treasureSorts, requiredTreasures, category } = data;
+    return contents.flatMap(content => {
+      return steps.map(step => {
+        const _requiredTreasures = requiredTreasures[step.name as keyof typeof stepEntries] as RequiredTreasureData[];
+        const _treasureSorts = treasureSorts[step.name];
+        const extractedRequiredTreasures = _requiredTreasures.map(requiredTreasureData => {
+          const { treasures, targets } = requiredTreasureData;
+          const createdTargets = targets ? { targets: _extractContentTreasures(content, targets) } : {};
+          const createdTreasures = treasures ? { treasures: _extractContentTreasures(content, treasures) } : {};
+          return {
+            ...requiredTreasureData,
+            ...createdTargets,
+            ...createdTreasures,
+          };
+        });
+        const requiredTreasuresByTags = _createRequiredTreasuresByTags(content, extractedRequiredTreasures);
+        const createdRequiredTreasuresByTags = requiredTreasuresByTags ? { requiredTreasuresByTags } : {};
+        const toProps = {
+          content: { ...content, category, step },
+          requiredTreasures: extractedRequiredTreasures,
+          ...createdRequiredTreasuresByTags,
+          treasureSorts: _treasureSorts,
+        };
+        return { params: { content: content.name, step: step.name }, props: { data: toProps } };
+      });
+    });
+  });
+  function _createRequiredTreasuresByTags(content: ContentData, requiredTreasures: RequiredTreasureData[]) {
+    const sepalated = requiredTreasures.reduce(
+      (accu, requiredTreasure) => {
+        const { tags } = requiredTreasure;
+        if (!tags) return accu;
+        tags.forEach(tag => {
+          const existTag = accu.hasOwnProperty(tag);
+          existTag ? accu[tag].push(requiredTreasure) : (accu[tag] = [requiredTreasure]);
+        });
+        return accu;
+      },
+      {} as { [K in RequiredTag]: RequiredTreasureData[] },
+    );
+
+    const exist = Object.keys(sepalated).length === 0;
+    if (exist) return null;
+
+    const requiredTreasureByTags = Object.entries(sepalated).map(entry => {
+      const [tag, requiredTreasures] = entry;
+      const tagEntry = requiredTagEntries[tag as RequiredTag];
+      const extractedTreasures = _extractContentTreasures(content, tagEntry.treasures);
+      return {
+        tagEntry: {
+          ...tagEntry,
+          treasures: extractedTreasures,
+        },
+        requiredTreasures,
+      };
+    });
+    return requiredTreasureByTags;
+  }
+  function _extractContentTreasures(content: ContentData, treasures: TreasuresData): TreasuresData {
+    return treasures.filter(treasure => {
+      const { whose } = treasure;
+      if (!whose) return true;
+      const isTarget = whose === content.name;
+      return isTarget;
+    });
+  }
+}
+
+const {
+  data: { content, requiredTreasures, treasureSorts, requiredTreasuresByTags },
+} = Astro.props;
+
+export type Content = typeof content;
+
+const { step, category } = content;
+const contentLabel = content.label;
+const stepLable = step.label;
+const settingType = step.settingType;
+const accuModalBtnListStyles = {
+  d: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  justifyContent: 'start',
+  '&+&': { mt: '{spacing.row.section}' },
+};
+const accuModalBtnInfoStyles = {
+  d: 'grid',
+  alignItems: 'center',
+  fontWeight: '700',
+  h: '100%',
+  pl: '1rem',
+  bt: '1px inset {colors.bg.op20}',
+};
+const accuModalBtnSkeletonStyles = {
+  w: '100%',
+  aspectRatio: '{aspectRatios.thumbnail}',
+};
+
+function createInfoModalID(processIndex: number) {
+  return `process${processIndex}-info`;
+}
+
+function replaceProcessLabel(processLabel: string, targets: RequiredTreasureData['targets'], content: Content) {
+  const targetReplace = /target/.test(processLabel) && targets;
+  const contentReplace = /content/.test(processLabel);
+
+  let replaced = processLabel;
+
+  if (targetReplace) {
+    replaced = replaced.replace('target', targets[0].label);
+  }
+  if (contentReplace) {
+    replaced = replaced.replace('content', content.label);
+  }
+
+  return replaced;
+}
+---
+
+<Layout
+  title={`${category.label} / ${contentLabel} - ${stepLable} の必要素材｜GBFHelper - グラブル攻略`}
+  description={`${category.label} / ${contentLabel}の${stepLable}に必要な素材、手順をまとめています。`}>
+  <InitSettingStore
+    settingType={settingType?.name}
+    contentName={content.name}
+    stepName={step.name}
+    categoryName={category.name}
+    initialElementName={content?.element?.name ?? 'fire'}
+  />
+  <MainVisual featureName="contents_chart" />
+  <MainSection
+    title={`${contentLabel}｜${stepLable}`}
+    isObjectContents={true}>
+    <ContentsLabel
+      isDark={true}
+      content={content}
+      viewCurrentSetting={settingType ? true : false}
+      swapSettingLabel={true}
+      square={true}
+      class={css({
+        w: '50%',
+      })}
+    />
+  </MainSection>
+  <SettingSection
+    settingType={step.settingType}
+    content={content}
+  />
+  <MainSection
+    title="必要素材（まとめ）"
+    isObjectContents={true}>
+    <ul>
+      <li class={css(accuModalBtnListStyles)}>
+        <RequiredTreasureModalBtn
+          modalID="all"
+          settingTypeName={settingType?.name}
+          targets={[{ name: 'treasure', label: 'トレジャー', group: 'label', number: 0 }]}
+          skeletonClassName={css(accuModalBtnSkeletonStyles)}
+        />
+        <PReact className={css(accuModalBtnInfoStyles)}> {stepLable}に必要な素材 </PReact>
+      </li>
+      {
+        requiredTreasuresByTags &&
+          requiredTreasuresByTags.map(entry => {
+            const { tagEntry } = entry;
+            return (
+              <li class={css(accuModalBtnListStyles)}>
+                <RequiredTreasureModalBtn
+                  modalID={tagEntry.name}
+                  targets={tagEntry.treasures}
+                  settingTypeName={settingType?.name}
+                  skeletonClassName={css(accuModalBtnSkeletonStyles)}
+                />
+                <PReact className={css(accuModalBtnInfoStyles)}>{tagEntry.label}</PReact>
+              </li>
+            );
+          })
+      }
+    </ul>
+    <RequiredTreasureModalAll
+      content={content}
+      settingTypeName={settingType?.name}
+      allRequiredTreasures={requiredTreasures}
+      treasureSorts={treasureSorts}
+      modalLabel={`${stepLable}に必要な素材`}
+    />
+    {
+      requiredTreasuresByTags &&
+        requiredTreasuresByTags.map(requiredTreasuresEntry => {
+          const { tagEntry, requiredTreasures } = requiredTreasuresEntry;
+          return (
+            <RequiredTreasureModalByTags
+              content={content}
+              settingTypeName={settingType?.name}
+              allRequiredTreasures={requiredTreasures}
+              treasureSorts={treasureSorts}
+              tagEntry={tagEntry}
+            />
+          );
+        })
+    }
+  </MainSection>
+  <MainSection
+    title="必要素材（手順ごと）"
+    isObjectContents={true}>
+    <ol>
+      {
+        requiredTreasures.map((data, i) => {
+          const { process, targets, targetsAsLabel } = data;
+          // const { DirectInfo, textDirectInfo } = process;
+          const processIndex = i + 1;
+          const modalID = `process${processIndex}`;
+          const replacedProcessLabel = replaceProcessLabel(process.label, targets, content);
+          // const isTotalReplace = /total/.test(replacedProcessLabel);
+          return (
+            <li
+              class={css({
+                d: 'grid',
+                gridTemplateColumns: '1rem auto',
+                // columnGap: '.25rem',
+                placeItems: 'start',
+                fontSize: '.75rem',
+                fontWeight: '700',
+                pos: 'relative',
+                '&+&': { mt: '{spacing.row.section}' },
+              })}>
+              <div
+                class={css({
+                  d: 'grid',
+                  // placeItems: 'center',
+                  justifyContent: 'center',
+                  w: '100%',
+                  h: '100%',
+                  color: '{colors.gray}',
+                  bgColor: '{colors.bg}',
+                  pt: '.125rem',
+                })}>
+                {processIndex}
+              </div>
+              <div
+                class={css({
+                  w: '100%',
+                  bt: '1px solid {colors.bg.op20}',
+                  pl: '.25rem',
+                  pb: process.infoOnly ? undefined : '.25rem',
+                })}>
+                <h3
+                  class={css({
+                    py: '.125rem',
+                  })}>
+                  {replacedProcessLabel}
+                </h3>
+                <div
+                  class={
+                    process.infoOnly
+                      ? null
+                      : css({
+                          d: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          columnGap: '.5rem',
+                        })
+                  }>
+                  {!process.infoOnly && (
+                    <RequiredTreasureModalBtn
+                      modalID={modalID}
+                      settingTypeName={settingType?.name}
+                      targets={targetsAsLabel ? targetsAsLabel : targets}
+                      processIndex={processIndex}
+                      skeletonClassName={css({
+                        w: 'calc(({sizes.skeleton.sectionInsideW} - 1.75rem) / 2)',
+                        aspectRatio: '{aspectRatios.thumbnail}',
+                      })}
+                    />
+                  )}
+                  {process.DirectInfo && (
+                    <div
+                      class={css({
+                        minW: 0,
+                        fontWeight: '400',
+                        pos: 'relative',
+                        py: '.375rem',
+                      })}>
+                      <process.DirectInfo
+                        targets={targets}
+                        content={content}
+                      />
+                    </div>
+                  )}
+                  {process.textDirectInfo && (
+                    <div
+                      class={css({
+                        minW: 0,
+                        fontWeight: '400',
+                        py: '.375rem',
+                      })}>
+                      {process.textDirectInfo}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </li>
+          );
+        })
+      }
+    </ol>
+    {
+      requiredTreasures.map((data, i) => {
+        const { process, targets, treasures } = data;
+        const processIndex = i + 1;
+        const replacedProcessLabel = replaceProcessLabel(process.label, targets, content);
+        return (
+          <>
+            {!process.infoOnly && (
+              <RequiredTreasureModal
+                modalID={`process${processIndex}`}
+                settingTypeName={settingType?.name}
+                content={content}
+                treasures={treasures}
+                targets={targets}
+                modalLabel={replacedProcessLabel}
+                processIndex={processIndex}
+              />
+            )}
+            {process.infoModal && (
+              <MainModalBody
+                modalID={createInfoModalID(processIndex)}
+                class={css({
+                  maxW: '{sizes.maxSp}',
+                  d: 'none',
+                  '&[open]': { d: 'block' },
+                })}>
+                <section class={css({})}>
+                  <RequiredTreasureModalLabel
+                    as="h3"
+                    label={`【${replacedProcessLabel}】の${process.infoModal.btnLabel}`}
+                    processIndex={processIndex}
+                    class={css({
+                      pos: 'sticky',
+                      top: 0,
+                      zIndex: 10,
+                      boxShadow: '0px 1px 4px #000',
+                    })}
+                  />
+                  <div
+                    class={css({
+                      pd: '{spacing.row.section} 1rem',
+                      color: '{colors.gray}',
+                    })}>
+                    <process.infoModal.BodyComponent className={css({ color: '{colors.gray}' })} />
+                  </div>
+                </section>
+              </MainModalBody>
+            )}
+          </>
+        );
+      })
+    }
+    <TreasureModalReact client:idle />
+  </MainSection>
+</Layout>

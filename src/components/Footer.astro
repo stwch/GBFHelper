@@ -1,0 +1,59 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { Image } from 'astro:assets';
+import SiteTitle from 'src/components/internal/SiteTitle.astro';
+import { css } from 'styled-system/css';
+
+interface Props extends HTMLAttributes<'footer'> {}
+const { class: className } = Astro.props;
+---
+
+<footer
+  class:list={[
+    className,
+    css({
+      radius: '4px',
+      bgColor: '#555',
+      pd: '1rem',
+      color: '{colors.gray}'
+    })
+  ]}>
+  <SiteTitle
+    as="span"
+    class={css({ fontSize: '2rem', mb: '{spacing.row.p}' })}
+  />
+  <a
+    href="https://x.com/web_holic_"
+    class={css({
+      d: 'grid',
+      placeItems: 'center',
+      w: '1.75rem',
+      aspectRatio: '1/1',
+      bgColor: '#000',
+      pd: '.25rem',
+      radius: '2px',
+      mb: '{spacing.row.p}'
+    })}>
+    <Image
+      class={css({
+        d: 'block'
+      })}
+      src="/images/icon/x-logo.svg"
+      alt="X ロゴ"
+      width={1200}
+      height={1227}
+    />
+  </a>
+  <div class={css({ fontSize: '.75rem', lineHeight: 1, fontWeight: '200' })}>
+    <p class={css({ mb: '.25rem' })}>権利表記</p>
+    <p class={css({ mb: '{spacing.row.p}' })}>
+      当サイトで使用している、画像およびテキストの著作権、商標権、その他知的財産権は、コンテンツの提供元へ帰属します。
+    </p>
+    <a
+      href="/privacypolicy"
+      class={css({ d: 'block', mb: '{spacing.row.p}', textDecoration: 'revert' })}>
+      プライバシーポリシー
+    </a>
+    <small class={css({ d: 'block' })}> &copy;2024 GBFHelper </small>
+  </div>
+</footer>

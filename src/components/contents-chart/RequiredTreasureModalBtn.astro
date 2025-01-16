@@ -1,0 +1,102 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { Image } from 'astro:assets';
+import type { SettingTypeName } from 'src/assets/data/common';
+import NumberLabelReact from 'src/components/contents-chart/internal/NumberLabelReact';
+import TargetImage from 'src/components/contents-chart/internal/TargetImage.astro';
+import MainModalBtn from 'src/components/internal/MainModalBtn.astro';
+import type { RequiredTreasureData } from 'src/helpers/createContentsData';
+import { css, cx } from 'styled-system/css';
+
+interface Props extends HTMLAttributes<'button'> {
+  modalID: string;
+  settingTypeName?: SettingTypeName;
+  targets: RequiredTreasureData['targets'];
+  processIndex?: number;
+  skeletonClassName?: string;
+}
+const { class: className, modalID, targets, settingTypeName, skeletonClassName } = Astro.props;
+if (!targets) throw new Error('targets がundefined です');
+const target = targets[0];
+const isSetting = target.isSetting;
+const targetNumber = target.number;
+const pathRoot = target.thumbnailPathRoot ?? 'treasure';
+---
+
+<MainModalBtn
+  modalID={modalID}
+  class={className}>
+  <span
+    class={cx(
+      className,
+      css({
+        d: 'block',
+        bo: '1px solid {colors.bg}',
+        boxShadow: '1px 1px 4px #000',
+        pos: 'relative'
+      }),
+      skeletonClassName
+    )}>
+    {
+      isSetting ? (
+        <TargetImage
+          settingTypeName={settingTypeName}
+          targets={targets}
+        />
+      ) : (
+        <span
+          class={css({
+            d: 'block',
+            pos: 'relative'
+          })}>
+          <Image
+            src={`/images/thumbnail/${pathRoot}/${targets[0].name}.jpg`}
+            alt={targets[0].label}
+            width={280}
+            height={160}
+          />
+          {targetNumber > 1 && (
+            <NumberLabelReact
+              number={targetNumber}
+              className={css({
+                fontSize: 'clamp(1.5rem, 5svw ,2rem)',
+                pos: 'absolute',
+                bottom: '12%',
+                left: '50%'
+              })}
+            />
+          )}
+        </span>
+      )
+    }
+    <span class={css({ pos: 'absolute', right: 0, top: 0, zIndex: 1 })}>
+      <span
+        class={css({
+          d: 'grid',
+          placeItems: 'center',
+          w: '1rem',
+          aspectRatio: '1/1',
+          fontFamily: 'notoSerifJP',
+          fontSize: '.75rem',
+          fontWeight: '700',
+          lineHeight: 1,
+          pos: 'relative',
+          '&::before': {
+            content: '""',
+            d: 'block',
+            w: '100%',
+            aspectRatio: '1/1',
+            bgColor: '{colors.gray}',
+            radius: '100px',
+            boxShadow: '1px 1px 3px {colors.bg}, 0px 0px 1px {colors.bg}',
+            pos: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: -1
+          }
+        })}>
+        i
+      </span>
+    </span>
+  </span>
+</MainModalBtn>

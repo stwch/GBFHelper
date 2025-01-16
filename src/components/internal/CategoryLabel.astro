@@ -1,0 +1,51 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { Image } from 'astro:assets';
+import type { CategoryData } from 'src/helpers/createContentsData';
+import { css } from 'styled-system/css';
+
+type Props<Tag extends HTMLTag> = Polymorphic<{
+  as: Tag;
+  isBottomRightRadius?: boolean;
+  category: CategoryData;
+}>;
+
+const { class: className, as: Tag, isBottomRightRadius, category } = Astro.props;
+---
+
+<Tag
+  class:list={[
+    className,
+    css({
+      d: 'inline-grid',
+      gridTemplateColumns: 'auto auto',
+      columnGap: '.25rem',
+      alignItems: 'center',
+      radius: isBottomRightRadius ? '0 0 100px 0' : '0 100px 0 0',
+      bgColor: '{colors.gray}',
+      fontWeight: '700',
+      lineHeight: 1,
+      pd: isBottomRightRadius ? '.25rem 1.25rem .25rem .25rem' : '.125rem 1rem .125rem .125rem',
+      pos: 'relative',
+      zIndex: 1,
+      '&::before': {
+        content: '""',
+        d: 'block',
+        bgImage: 'url(/images/bg-pattern-dark.png)',
+        opacity: '0.2',
+        bgSize: 'contain',
+        pos: 'absolute',
+        inset: 0,
+        zIndex: '-1'
+      }
+    })
+  ]}>
+  <Image
+    class={css({ maxH: '1.25rem' })}
+    src={`/images/icon/category/${category.name}.png`}
+    alt={`${category.label}のカテゴリーアイコン`}
+    width={40}
+    height={48}
+  />
+  {category.label}
+</Tag>

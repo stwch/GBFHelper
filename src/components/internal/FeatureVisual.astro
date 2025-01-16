@@ -1,0 +1,130 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import SiteTitle from 'src/components/internal/SiteTitle.astro';
+import { css } from 'styled-system/css';
+import type { SystemStyleObject } from 'styled-system/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  isUnderSection?: boolean;
+  title: string;
+}
+const { class: className, isUnderSection, title } = Astro.props;
+
+const lineStyle: SystemStyleObject = {
+  content: '""',
+  d: 'block',
+  w: '100%',
+  h: '4px',
+  bgColor: '{colors.gray}',
+  radius: '100%',
+  filter: 'blur(2px)',
+  pos: 'absolute',
+  zIndex: '-1'
+};
+const lightStyle: SystemStyleObject = {
+  content: '""',
+  d: 'block',
+  aspectRatio: '1/1',
+  bgColor: '{colors.gray}',
+  radius: '100px'
+};
+
+const Heading = isUnderSection ? 'h3' : 'h1';
+---
+
+<div
+  class:list={[
+    className,
+    css({
+      aspectRatio: '2/1',
+      overflow: 'hidden',
+      bgColor: '{colors.bg}',
+      pos: 'relative',
+      zIndex: '-1',
+      '&::after': {
+        //背景
+        content: '""',
+        d: 'block',
+        pos: 'absolute',
+        left: '-10%',
+        bottom: '-10%',
+        w: '75%',
+        aspectRatio: '759/553',
+        bgImage: 'url(/images/bg-pattern-light-one.png)',
+        bgRepeat: 'no-repeat',
+        bgSize: '100%',
+        filter: 'opacity(6%)'
+      }
+    })
+  ]}>
+  <Heading
+    class={css({
+      color: '{colors.gray}',
+      pt: '.5rem',
+      pl: '.5rem',
+      pos: 'relative',
+      '&::before': {
+        //縦の閃光
+        ...lineStyle,
+        top: '-50%',
+        transformOrigin: 'left',
+        rotate: '90deg'
+      }
+    })}>
+    <span
+      class={css({
+        pos: 'relative',
+        '&::before': {
+          //横の閃光
+          ...lineStyle,
+          left: '-1rem',
+          bottom: '1.5rem'
+        }
+      })}>
+      <SiteTitle
+        as="span"
+        class={css({ fontSize: '3rem' })}
+      />
+      <span
+        class={css({
+          d: 'block',
+          fontFamily: 'notoSerifJP, serif',
+          fontWeight: 900,
+          mt: '-0.375rem',
+          pl: '.25rem',
+          filter: 'drop-shadow(1px 1px 2px {colors.text})'
+        })}>
+        {title}
+      </span>
+      <span
+        class={css({
+          //光
+          d: 'block',
+          aspectRatio: '1/1',
+          h: '100%',
+          pos: 'absolute',
+          top: '0',
+          left: '0',
+          translate: '-50%',
+          zIndex: '-1',
+          '&::before': {
+            //淡い光
+            ...lightStyle,
+            w: '100%',
+            filter: 'blur(20px)'
+          },
+          '&::after': {
+            //中心の強い光
+            ...lightStyle,
+            w: '50%',
+            filter: 'blur(5px)',
+            pos: 'absolute',
+            top: `calc(50% + .5rem)`,
+            left: '1.25rem',
+            translate: '0 -50%'
+          }
+        })}></span>
+    </span>
+    <slot />
+  </Heading>
+</div>

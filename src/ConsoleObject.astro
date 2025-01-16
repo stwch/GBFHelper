@@ -1,0 +1,21 @@
+---
+interface Props {
+  data: any;
+  isJSON?: boolean;
+}
+const { data, isJSON } = Astro.props;
+---
+
+<div
+  data-dev={JSON.stringify(data)}
+  data-json={isJSON}>
+</div>
+<script>
+  const dataDOMs: NodeListOf<HTMLDivElement> = document.querySelectorAll('[data-dev]');
+  dataDOMs.forEach(dataDOM => {
+    const devData = dataDOM.dataset.dev as string;
+    const isJSON = dataDOM.hasAttribute('data-json');
+    const data = isJSON ? devData : JSON.parse(devData);
+    console.log(data);
+  });
+</script>

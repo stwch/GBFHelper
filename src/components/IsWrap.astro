@@ -1,0 +1,20 @@
+---
+import type { HTMLAttributes, HTMLTag } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div' | 'li'> {
+  as?: HTMLTag;
+  isWrap?: boolean;
+}
+
+const { class: className, as: Tag = 'div', isWrap } = Astro.props;
+---
+
+{
+  isWrap ? (
+    <Tag class={className}>
+      <slot />
+    </Tag>
+  ) : (
+    <slot />
+  )
+}

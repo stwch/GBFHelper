@@ -1,0 +1,8 @@
+img {
+  max-width: 100%;
+  backface-visibility: hidden;
+}
+
+button:active {
+  transform: translateY(1px) scale(.99);
+}

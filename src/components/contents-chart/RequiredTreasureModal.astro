@@ -1,0 +1,153 @@
+---
+import type { ComponentProps } from 'astro/types';
+import type { SettingTypeName } from 'src/assets/data/common';
+import AccuRequiredTreasureList from 'src/components/contents-chart/AccuRequiredTreasureList.astro';
+import RequiredTreasureModalLabel from 'src/components/contents-chart/internal/RequiredTreasureModalLabel.astro';
+import RequiredTreasure from 'src/components/contents-chart/RequiredTreasure.astro';
+import TargetTreasure from 'src/components/contents-chart/TargetTreasure.astro';
+import ContentsLabel from 'src/components/ContentsLabel.astro';
+import MainModalBody from 'src/components/internal/MainModalBody.astro';
+import type { RequiredTreasureData, TreasureSorts } from 'src/helpers/createContentsData';
+import type { Content } from 'src/pages/contents-chart/[content]-[step]/index.astro';
+import { css } from 'styled-system/css';
+import type { SystemStyleObject } from 'styled-system/types';
+
+interface Props extends ComponentProps<typeof MainModalBody> {
+  content: Content;
+  treasures: RequiredTreasureData['treasures'];
+  targets?: RequiredTreasureData['targets'];
+  treasureSorts?: TreasureSorts[string];
+  swapContentTarget?: boolean;
+  modalLabel: string;
+  processIndex?: number;
+  isAccu?: boolean;
+  settingTypeName?: SettingTypeName;
+  isPlaneModalLabel?: boolean;
+}
+const {
+  class: className,
+  modalID,
+  content,
+  treasures,
+  targets,
+  treasureSorts,
+  swapContentTarget,
+  modalLabel,
+  processIndex,
+  isAccu,
+  settingTypeName,
+  isPlaneModalLabel
+} = Astro.props;
+
+if (!treasures) {
+  throw new Error(`プロパティ「treasures」がundefined です\n該当コンテンツ: ${content.name}-${content.step.name}`);
+}
+
+const widthProp = 'min(280px, 66.6%)';
+const tryangleStyles: SystemStyleObject = {
+  w: '1rem',
+  h: '.75rem',
+  radius: '2px',
+  bgColor: '{colors.gray}',
+  clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)'
+};
+const treasureListStyles: SystemStyleObject = {
+  d: 'grid',
+  gridTemplateColumns: 'repeat(4, 1fr)',
+  gap: '.25rem'
+};
+---
+
+<MainModalBody
+  modalID={modalID}
+  class:list={[
+    className,
+    css({
+      // maxW: '{sizes.maxSp}',
+      maxW: '468px',
+      d: 'none',
+      '&[open]': { d: 'block' }
+    })
+  ]}>
+  <section>
+    <div
+      class={css({
+        pos: 'sticky',
+        top: 0,
+        zIndex: 10
+      })}>
+      <RequiredTreasureModalLabel
+        as="h3"
+        label={isPlaneModalLabel ? modalLabel : `【${modalLabel}】の必要素材`}
+        processIndex={processIndex}
+        class={css({ boxShadow: '0px 1px 4px #000' })}
+      />
+    </div>
+    <div class={css({ pd: '{spacing.row.section} 1rem' })}>
+      {
+        swapContentTarget ? (
+          <ContentsLabel
+            content={content}
+            viewCurrentSetting={true}
+            swapSettingLabel={content.step.settingType ? true : false}
+            square={true}
+            class={css({ w: widthProp })}
+          />
+        ) : (
+          targets && (
+            <TargetTreasure
+              settingTypeName={settingTypeName}
+              targets={targets}
+              class={css({ w: widthProp })}
+            />
+          )
+        )
+      }
+      <div
+        class={css({
+          d: 'grid',
+          gridTemplateColumns: 'repeat(3, auto)',
+          columnGap: '.125rem',
+          justifyContent: 'center',
+          w: widthProp,
+          my: '{spacing.row.section}',
+          filter: 'drop-shadow(1px 1px 1px #000)',
+          '&::before': {
+            content: '""',
+            d: 'block',
+            ...tryangleStyles
+          },
+          '&::after': {
+            content: '""',
+            d: 'block',
+            ...tryangleStyles
+          }
+        })}>
+        <div class={css({ ...tryangleStyles })}></div>
+      </div>
+      {
+        isAccu ? (
+          <AccuRequiredTreasureList
+            treasures={treasures}
+            treasureSorts={treasureSorts}
+            settingTypeName={settingTypeName}
+            class={css(treasureListStyles)}
+          />
+        ) : (
+          <ul class={css(treasureListStyles)}>
+            {treasures.map(treasure => {
+              return (
+                <RequiredTreasure
+                  as="li"
+                  settingTypeName={settingTypeName}
+                  treasure={treasure}
+                />
+              );
+            })}
+          </ul>
+        )
+      }
+    </div>
+  </section>
+  <slot name="visual" />
+</MainModalBody>

@@ -1,0 +1,37 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import MainSection from 'src/components/MainSection.astro';
+import PReact from 'src/components/PReact';
+import Layout from 'src/layouts/Layout.astro';
+import { css } from 'styled-system/css';
+
+interface Props extends HTMLAttributes<'div'> {
+  isUnderSection?: boolean;
+  title: string;
+}
+---
+
+<Layout
+  title="プライバシーポリシー｜GBFHelper - グラブル攻略"
+  description="個人情報の取り扱いについて、免責事項に関することなどを記載しています"
+  mainClassName={css({ pt: '2rem' })}>
+  <MainSection title="プライバシーポリシー">
+    <PReact>
+      当Webサイトでは、第三者が運営する広告配信サービス「忍者AdMax」を利用して広告を表示しています。<br />
+      「忍者AdMax」では、広告の配信にCookieを使用しており、ユーザーの行動履歴からユーザーが興味を持ちそうな商品、サービスを表示させる場合があります。<br
+      />
+      また、当Webサイト内での行動履歴が、別のWebサイトでの広告配信に利用される場合もあります。<br />
+      Cookieは、ユーザーの名前や住所、メールアドレス、電話番号などの個人情報を特定するものではありません。
+    </PReact>
+  </MainSection>
+  <MainSection title="免責事項">
+    <PReact>
+      当Webサイトに掲載された内容によって生じた損害等の一切の責任を負いかねます。<br />
+      当Webサイトのご利用は、自己責任でお願いいたします。<br />
+      なお、当Webサイトの内容、情報は正確性を重視して掲載しておりますが、情報が古くなったり、誤情報が入っていたりする可能性もございます。<br
+      />
+      必ずしも正確性を保証するものではありません。<br />
+      また、当Webサイトで紹介しているリンク先のWebサイト上で提供される情報、サービスに関しましても一切の責任は負いかねます。
+    </PReact>
+  </MainSection>
+</Layout>

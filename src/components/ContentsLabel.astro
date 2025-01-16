@@ -1,0 +1,203 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { Image } from 'astro:assets';
+import { starData } from 'src/assets/data/common';
+import CurrentElementChangeLabelReact from 'src/components/internal/CurrentElementChangeLabelReact';
+import CurrentMultiplyLabelReact from 'src/components/internal/CurrentMultiplyLabelReact';
+import type { Content } from 'src/pages/contents-chart/[content]-[step]/index.astro';
+import { css } from 'styled-system/css';
+
+interface Props extends HTMLAttributes<'span'> {
+  viewCurrentSetting?: boolean;
+  swapSettingLabel?: boolean;
+  isDark?: boolean;
+  content: Content;
+  square?: boolean;
+}
+const { class: className, viewCurrentSetting, swapSettingLabel, isDark, content } = Astro.props;
+const { step } = content;
+
+const settingType = step.settingType;
+const stepStar = starData[step.name as keyof typeof starData];
+const viewBottom = (swapSettingLabel && step.settingType) || !swapSettingLabel; //名前の場合は必ず表示して、設定の場合はあれば表示する
+const bottomLabel = swapSettingLabel ? settingType?.label : content.label;
+const isElementChange = settingType?.name === 'element_change';
+const isMultiply = settingType?.name === 'multiply';
+// const categoryData = _extractCategory(content.category);
+const contentImagePath = _createContentsImagePath(content);
+const thumbnailRootPath = _createThumbnailRootPath(content);
+
+const outsideSpace = '.25rem';
+//変化するスタイル
+const bgColorProp = isDark ? '{colors.bg}' : '{colors.gray}';
+const bgImageProp = isDark ? 'url(/images/bg-pattern-light.png)' : 'url(/images/bg-pattern-dark.png)';
+const colorProp = isDark ? '{colors.gray}' : undefined;
+// const radiusProp = square ? '2px' : '0 0 50px 0';
+const radiusProp = '2px';
+
+function _createContentsImagePath(content: Content) {
+  const {
+    name,
+    step: { notAddToPath, staticStepPath }
+  } = content;
+  if (notAddToPath) return name;
+  if (staticStepPath) return `${name}-${staticStepPath}`;
+  return `${name}-${step.name}`;
+}
+// function _extractCategory(category: CategoryData) {
+//   const existingAsCategory = category.asCategory;
+//   return existingAsCategory ? existingAsCategory : category;
+// }
+function _createThumbnailRootPath(content: Content) {
+  const {
+    category,
+    step: { staticRootPath }
+  } = content;
+  if (staticRootPath) return staticRootPath;
+  if (category.asCategory) return category.asCategory.name;
+  return category.name;
+}
+---
+
+<span
+  class:list={[
+    className,
+    css({
+      maxW: '280px',
+      d: 'block',
+      fontSize: '.75rem',
+      fontWeight: '700',
+      radius: radiusProp,
+      overflow: 'hidden',
+      color: colorProp,
+      pos: 'relative'
+    })
+  ]}>
+  <span
+    class={css({
+      pos: 'absolute',
+      top: 0,
+      right: 0,
+      zIndex: 2
+    })}>
+    <span
+      class={css({
+        d: 'inline-block',
+        radius: '0 0 0 100px',
+        bgColor: bgColorProp,
+        pos: 'relative',
+        '&::before': {
+          content: '""',
+          d: 'block',
+          pos: 'absolute',
+          inset: 0,
+          bgImage: bgImageProp,
+          bgSize: 'contain',
+          opacity: '0.2'
+        }
+      })}>
+      <span
+        class={css({
+          d: 'inline-grid',
+          gridTemplateColumns: 'auto auto',
+          columnGap: '.125rem',
+          alignItems: 'center',
+          pd: `0 ${outsideSpace} .125rem .5rem`,
+          pos: 'relative',
+          zIndex: 1
+        })}>
+        <Image
+          class={css({ w: '1rem' })}
+          src={`/images/icon/star/${stepStar.star}.png`}
+          width={32}
+          height={32}
+          alt="解放段階のスター"
+        />
+        {stepStar.label}
+      </span>
+    </span>
+  </span>
+  <span
+    class={css({
+      d: 'block',
+      w: '100%',
+      aspectRatio: '{aspectRatios.thumbnail}',
+      pos: 'relative'
+    })}>
+    <Image
+      src={`/images/thumbnail/${thumbnailRootPath}/${contentImagePath}.jpg`}
+      width={280}
+      height={160}
+      alt={`${content.label}｜${step.label}`}
+    />
+    {
+      viewBottom && (
+        <span
+          class={css({
+            pos: 'absolute',
+            left: 0,
+            bottom: 0
+          })}>
+          <span
+            class={css({
+              d: 'inline-block',
+              bgColor: bgColorProp,
+              radius: '0 100px 0 0',
+              pos: 'relative',
+              '&::before': {
+                content: '""',
+                d: 'block',
+                pos: 'absolute',
+                inset: 0,
+                bgImage: bgImageProp,
+                bgSize: 'contain',
+                opacity: '0.2'
+              }
+            })}>
+            <span
+              class={css({
+                pd: `.125rem .625rem 0 ${outsideSpace}`,
+                pos: 'relative'
+              })}>
+              {bottomLabel}
+            </span>
+          </span>
+        </span>
+      )
+    }
+  </span>
+  <span
+    class={css({
+      d: 'block',
+      bgColor: bgColorProp,
+      pd: '.125rem 0 .125rem .125rem',
+      pos: 'relative',
+      zIndex: 1,
+      '&::before': {
+        content: '""',
+        d: 'block',
+        bgImage: bgImageProp,
+        bgSize: '4rem',
+        opacity: '0.15',
+        pos: 'absolute',
+        inset: 0,
+        zIndex: -1
+      }
+    })}>
+    <span
+      class={css({
+        d: 'block',
+        w: viewCurrentSetting ? (isElementChange ? '1.25rem' : isMultiply ? '1.125rem' : undefined) : undefined,
+        aspectRatio: viewCurrentSetting ? (settingType ? '{aspectRatios.icon}' : undefined) : undefined
+      })}>
+      {
+        viewCurrentSetting && (
+          <>
+            {isElementChange && <CurrentElementChangeLabelReact client:only="react" />}
+            {isMultiply && <CurrentMultiplyLabelReact client:only="react" />}
+          </>
+        )
+      }
+    </span>
+  </span>
+</span>

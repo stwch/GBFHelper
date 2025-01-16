@@ -1,0 +1,65 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import type { SettingTypeName } from 'src/assets/data/common';
+import ElementChangeTargetTreasureReact from 'src/components/contents-chart/internal/ElementChangeTargetTreasureReact';
+import MultiplyTargetTreasureReact from 'src/components/contents-chart/internal/MultiplyTargetTreasureReact';
+import TargetTreasureLabelReact from 'src/components/contents-chart/internal/TargetTreasureLabelReact';
+import type { TreasuresData } from 'src/helpers/createContentsData';
+import { css } from 'styled-system/css';
+import type { SystemStyleObject } from 'styled-system/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  targets: TreasuresData;
+  settingTypeName?: SettingTypeName;
+}
+const { targets, settingTypeName } = Astro.props;
+const { number, isSetting, isStatic } = targets[0];
+const isElementChange = settingTypeName === 'element_change';
+const isMultiply = settingTypeName === 'multiply';
+const styles: SystemStyleObject = { w: 'min(280px, 66.6%)' };
+---
+
+{
+  isSetting ? (
+    <>
+      {isElementChange && (
+        <ElementChangeTargetTreasureReact
+          client:only="react"
+          targets={targets}
+          className={css(styles)}
+        />
+      )}
+      {isMultiply && (
+        <MultiplyTargetTreasureReact
+          client:only="react"
+          targets={targets}
+          className={css({ w: '100%' })}
+        />
+      )}
+    </>
+  ) : isStatic ? (
+    <ul
+      class={css({
+        d: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '.25rem'
+      })}>
+      {targets.map(target => {
+        return (
+          <li>
+            <TargetTreasureLabelReact
+              target={target}
+              number={target.number}
+            />
+          </li>
+        );
+      })}
+    </ul>
+  ) : (
+    <TargetTreasureLabelReact
+      target={targets[0]}
+      number={number > 1 ? number : undefined}
+      className={css(styles)}
+    />
+  )
+}

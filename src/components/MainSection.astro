@@ -1,0 +1,55 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import MainTitle from 'src/components/MainTitle.astro';
+import { css } from 'styled-system/css';
+
+interface Props extends HTMLAttributes<'section'> {
+  isObjectContents?: boolean;
+  title: string;
+  redBorder?: boolean;
+}
+const { class: className, title, isObjectContents, id, redBorder } = Astro.props;
+---
+
+<section
+  id={id}
+  class:list={[
+    className,
+    css({
+      py: '2rem',
+      pl: '{spacing.inner.outside.left}',
+      mr: '{spacing.inner.outside.right}',
+      bt: redBorder ? '1px solid {colors.fire}' : '1px solid {colors.primary}',
+      br: redBorder ? '1px solid {colors.fire}' : '1px solid {colors.primary}',
+      bb: redBorder ? '1px solid {colors.fire}' : '1px solid {colors.primary}',
+      radius: '0 4px 4px 0',
+      bgColor: '{colors.gray}',
+      boxShadow: '4px 4px 8px #000',
+      pos: 'relative',
+      zIndex: 1,
+      '& + &': { mt: '{spacing.row.section}' },
+      '&::before': {
+        //背景
+        content: '""',
+        d: 'block',
+        w: '100%',
+        h: '100%',
+        bgImage: 'url(/images/bg-pattern-light.png)',
+        bgSize: 'contain',
+        opacity: '0.3',
+        pos: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: '-1'
+      }
+    })
+  ]}>
+  <MainTitle
+    text={title}
+    objectRow={isObjectContents}
+    class={css({ mr: '1rem' })}
+  />
+  <div class={css({ mx: '1rem' })}>
+    <slot />
+  </div>
+</section>

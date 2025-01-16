@@ -1,0 +1,38 @@
+---
+import type { SettingTypeName } from 'src/assets/data/common';
+import InitElementChangeStore from 'src/components/contents-chart/internal/InitElementChangeStore';
+import InitMultiplyStore from 'src/components/contents-chart/internal/InitMultiplyStore';
+import type { NeedMultiplyCategory } from 'src/stores/multiplyStore';
+
+interface Props {
+  settingType: SettingTypeName;
+  contentName: string;
+  stepName: string;
+  categoryName: string;
+  initialElementName: string;
+}
+const { settingType, contentName, stepName, initialElementName, categoryName } = Astro.props;
+const isElementChange = settingType === 'element_change';
+const isMultiply = settingType === 'multiply';
+---
+
+{
+  isElementChange && (
+    <InitElementChangeStore
+      client:only="react"
+      contentName={contentName}
+      stepName={stepName}
+      initialElementName={initialElementName}
+    />
+  )
+}
+{
+  isMultiply && (
+    <InitMultiplyStore
+      client:only="react"
+      contentName={contentName}
+      stepName={stepName}
+      categoryName={categoryName as NeedMultiplyCategory}
+    />
+  )
+}

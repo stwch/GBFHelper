@@ -1,0 +1,26 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { css } from 'styled-system/css';
+
+type Props<Tag extends HTMLTag> = Polymorphic<{ as: Tag; label?: string }>;
+
+const { as: Tag, class: className, label } = Astro.props;
+---
+
+<Tag
+  class:list={[
+    className,
+    css({
+      d: 'block',
+      fontFamily: 'ZTChintzy, system-ui',
+      lineHeight: 1,
+      color: 'transparent',
+      bgImage: 'url(/images/bg-pattern-light.png)',
+      bgSize: '8rem',
+      // bgSize: 'contain',
+      bgColor: '{colors.gray}',
+      bgClip: 'text',
+      filter: 'drop-shadow(1px 1px 2px {colors.text})'
+    })
+  ]}>{label ?? 'GBFHelper'}</Tag
+>

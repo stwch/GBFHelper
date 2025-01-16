@@ -1,0 +1,117 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { elementEntries, settingTypeEntries } from 'src/assets/data/common';
+import ElementChangeBtnReact from 'src/components/contents-chart/internal/ElementChangeBtnReact';
+import MultiplyBtnReact from 'src/components/internal/MultiplyBtnReact';
+import MultiplyCautionReact from 'src/components/internal/MultiplyCautionReact';
+import MultiplyResetBtnReact from 'src/components/internal/MultiplyResetBtnReact';
+import MainSection from 'src/components/MainSection.astro';
+import PReact from 'src/components/PReact';
+import createContentsData from 'src/helpers/createContentsData';
+import type { Content } from 'src/pages/contents-chart/[content]-[step]/index.astro';
+import { recommendTotalEntries, type NeedMultiplyCategory } from 'src/stores/multiplyStore';
+import { css } from 'styled-system/css';
+import type { SystemStyleObject } from 'styled-system/types';
+
+const settingInfoText = '設定は即時に反映され、何度でも変更が可能です。';
+
+interface Props extends HTMLAttributes<'section'> {
+  settingType: ReturnType<typeof createContentsData>['steps'][number]['settingType'];
+  content: Content;
+}
+const { settingType, content } = Astro.props;
+const settingName = settingType?.name;
+const isElementChange = settingName === settingTypeEntries['element_change'][1];
+const isMultiply = settingName === settingTypeEntries['multiply'][1];
+const recommendTotal = recommendTotalEntries[content.category.name as NeedMultiplyCategory];
+if (isMultiply && !recommendTotal)
+  throw new Error(`カテゴリー「${content.category.name}」は recommendTotalEntries に定義されていません`);
+
+const settingBtnListStyles: SystemStyleObject = {
+  d: 'grid',
+  gridTemplateColumns: {
+    _base: 'repeat(6, 1fr)',
+    sp: 'repeat(7, 1fr)'
+  },
+  justifyContent: 'start',
+  columnGap: '.5rem'
+};
+---
+
+{
+  isElementChange && (
+    <MainSection title="属性変更の設定">
+      <PReact>
+        属性変更の属性を設定できます。
+        <br />
+        この設定によって必要素材が切り替わります。
+      </PReact>
+      <PReact className={css({ mb: '{spacing.row.text}' })}>{settingInfoText}</PReact>
+      <ul class={css(settingBtnListStyles)}>
+        {Object.values(elementEntries).map(elementEntry => {
+          const [label, name] = elementEntry;
+          const elementData = { name, label };
+          return (
+            <li class={css({ aspectRatio: '1/1' })}>
+              <ElementChangeBtnReact
+                client:only="react"
+                contentName={content.name}
+                stepName={content.step.name}
+                element={elementData}
+              />
+            </li>
+          );
+        })}
+      </ul>
+    </MainSection>
+  )
+}
+{
+  isMultiply && (
+    <MainSection
+      class={css({
+        //必要
+        zIndex: 10
+      })}
+      title="本数の設定">
+      <PReact>
+        天星の欠片に必要な『天星器・属性変更』の本数を設定できます。
+        <br />
+        この設定によって、必要素材が切り替わります。
+      </PReact>
+      <PReact>
+        おすすめの設定は、合計本数が「{recommendTotal}本」になる設定です。
+        <br />
+        初期値はおすすめの設定になっています。
+      </PReact>
+      <PReact className={css({ mb: '{spacing.row.text}' })}>{settingInfoText}</PReact>
+      <ul class={css(settingBtnListStyles, { mb: '{spacing.row.section}' })}>
+        {Object.values(elementEntries).map(elementEntry => {
+          const [label, name] = elementEntry;
+          const elementData = { name, label };
+          return (
+            <li class={css({ h: '60px' })}>
+              <MultiplyBtnReact
+                client:only="react"
+                contentName={content.name}
+                stepName={content.step.name}
+                elementName={elementData.name}
+              />
+            </li>
+          );
+        })}
+      </ul>
+      <MultiplyResetBtnReact
+        client:load
+        contentName={content.name}
+        stepName={content.step.name}
+        categoryName={content.category.name as NeedMultiplyCategory}
+      />
+      <MultiplyCautionReact
+        client:only="react"
+        className={css({ mt: '2rem' })}
+        categoryName={content.category.name as NeedMultiplyCategory}
+      />
+    </MainSection>
+  )
+}

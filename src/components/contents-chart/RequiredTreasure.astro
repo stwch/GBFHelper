@@ -1,0 +1,49 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import type { SettingTypeName } from 'src/assets/data/common';
+import ElementChangeRequiredTreasureReact from 'src/components/contents-chart/internal/ElementChangeRequiredTreasureReact';
+import MultiplyRequiredTreasureReact from 'src/components/contents-chart/internal/MultiplyRequiredTreasureReact';
+import RequiredTreasureBtnReact from 'src/components/contents-chart/internal/RequiredTreasureBtnReact';
+import type { TreasuresData } from 'src/helpers/createContentsData';
+
+type Props<Tag extends HTMLTag> = Polymorphic<{
+  as: Tag;
+  settingTypeName: SettingTypeName;
+  treasure: TreasuresData[number];
+}>;
+
+const { class: className, as: Tag = 'div', settingTypeName, treasure } = Astro.props;
+const isSettingTreasure = treasure.isSetting;
+const isElementChange = settingTypeName === 'element_change';
+const isMultiply = settingTypeName === 'multiply';
+---
+
+{
+  isSettingTreasure ? (
+    <>
+      {isElementChange && (
+        <ElementChangeRequiredTreasureReact
+          client:only="react"
+          as={Tag}
+          treasure={treasure}
+          className={className}
+        />
+      )}
+      {isMultiply && (
+        <MultiplyRequiredTreasureReact
+          client:only="react"
+          as={Tag}
+          treasure={treasure}
+          className={className}
+        />
+      )}
+    </>
+  ) : (
+    <RequiredTreasureBtnReact
+      client:idle
+      as={Tag}
+      treasure={treasure}
+      className={className}
+    />
+  )
+}

@@ -1,0 +1,102 @@
+---
+import contentsData from 'src/assets/data/contentsData';
+import ContentsLabel from 'src/components/ContentsLabel.astro';
+import MainSection from 'src/components/MainSection.astro';
+import MainVisual from 'src/components/MainVisual.astro';
+import PReact from 'src/components/PReact';
+import ContentsModal from 'src/components/contents-chart/ContentsModal.astro';
+import ContentsModalBtn from 'src/components/contents-chart/ContentsModalBtn.astro';
+import type { CategoryData } from 'src/helpers/createContentsData';
+import Layout from 'src/layouts/Layout.astro';
+import { css } from 'styled-system/css';
+
+function _fixCategory(category: CategoryData) {
+  const { asCategory, ...categoryNameData } = category;
+  if (!asCategory) return categoryNameData;
+  return {
+    name: asCategory.name,
+    label: category.label,
+  };
+}
+---
+
+<Layout
+  title="コンテンツチャート｜GBFHelper - グラブル攻略"
+  description="対応コンテンツ一覧のページです。選んだコンテンツの必要素材、手順を表示します。">
+  <MainVisual featureName="contents_chart" />
+  <MainSection title="コンテンツチャート">
+    <PReact>選択したコンテンツの必要素材、手順を表示します。</PReact>
+    <PReact> コンテンツ一覧から目的のコンテンツを探し、データページへ移動してください。 </PReact>
+  </MainSection>
+  <MainSection
+    id="select"
+    title="コンテンツ一覧"
+    isObjectContents={true}>
+    <PReact className={css({ mb: '{spacing.row.section}' })}> カテゴリーを選択すると、一覧が表示されます。 </PReact>
+    <ul
+      class={css({
+        d: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '.5rem',
+      })}>
+      {
+        contentsData.map(data => {
+          const { category } = data;
+          const fixedCategory = _fixCategory(category);
+          return (
+            <li>
+              <ContentsModalBtn
+                modalID={category.name}
+                category={fixedCategory}
+                class={css({ w: '100%', h: '100%' })}
+              />
+            </li>
+          );
+        })
+      }
+    </ul>
+    {
+      contentsData.map(data => {
+        const { category, contents, steps } = data;
+        const fixedCategory = _fixCategory(category);
+        return (
+          <ContentsModal
+            modalID={category.name}
+            category={fixedCategory}>
+            {contents.map(content => {
+              return (
+                <ul
+                  class={css({
+                    d: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '.25rem',
+                    '& + &': {
+                      mt: '{spacing.row.section}',
+                    },
+                  })}>
+                  {steps.map(step => {
+                    return (
+                      <li>
+                        <a
+                          href={`/contents-chart/${content.name}-${step.name}`}
+                          class={css({ filter: 'drop-shadow(1px 1px 4px #000)' })}>
+                          <ContentsLabel
+                            content={{
+                              ...content,
+                              step,
+                              category,
+                            }}
+                          />
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              );
+            })}
+          </ContentsModal>
+        );
+      })
+    }
+  </MainSection>
+</Layout>

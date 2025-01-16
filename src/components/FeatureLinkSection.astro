@@ -1,0 +1,76 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import MainVisual from 'src/components/MainVisual.astro';
+import createFeatureData, { type FeatureName } from 'src/helpers/createFeatureData';
+import { css } from 'styled-system/css';
+interface Props extends HTMLAttributes<'section'> {
+  featureName: FeatureName;
+}
+const { class: className, featureName } = Astro.props;
+const feature = createFeatureData(featureName);
+---
+
+<section
+  class:list={[
+    className,
+    css({
+      radius: '4px',
+      bo: '1px solid {colors.bg}',
+      overflow: 'hidden',
+      boxShadow: '2px 2px 4px rgba(0, 0, 0, .5)',
+      '& + &': { mt: '2rem' }
+    })
+  ]}>
+  <MainVisual
+    class={css({ bgColor: '{colors.bg}' })}
+    featureName={featureName}
+    isUnderSection={true}
+  />
+  <div
+    class={css({
+      pd: '1rem .5rem',
+      bgColor: '{colors.gray}',
+      pos: 'relative',
+      zIndex: '1',
+      '&::before': {
+        content: '""',
+        d: 'block',
+        w: '100%',
+        h: '100%',
+        bgImage: 'url(/images/bg-pattern-light.png)',
+        bgSize: 'cover',
+        opacity: '0.3',
+        pos: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: '-1'
+      }
+    })}>
+    <slot />
+  </div>
+  <a
+    class={css({
+      d: 'grid',
+      gridTemplateColumns: 'auto auto',
+      alignItems: 'center',
+      justifyContent: 'start',
+      columnGap: '.25rem',
+      pl: '.5rem',
+      color: '{colors.gray}',
+      fontWeight: '700',
+      bgColor: '{colors.bg}',
+      '&::after': {
+        content: '""',
+        d: 'block',
+        mt: '.25rem',
+        radius: '100px',
+        w: '.5rem',
+        h: '.875rem',
+        bgColor: '{colors.gray}',
+        clipPath: ' polygon(0 0, 0% 100%, 100% 50%)'
+      }
+    })}
+    href={`/${featureName.replaceAll('_', '-')}`}>
+    {feature.title}へ
+  </a>
+</section>

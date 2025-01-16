@@ -1,0 +1,51 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { Image } from 'astro:assets';
+import CategoryLabel from 'src/components/internal/CategoryLabel.astro';
+import MainModalBtn from 'src/components/internal/MainModalBtn.astro';
+import type { CategoryData } from 'src/helpers/createContentsData';
+import { css } from 'styled-system/css';
+
+function _createFormat(category: string) {
+  const isSyuumatu = category === 'syuumatu';
+  const isJuttenKyokusei = category === 'jutten-kyokusei';
+  const isJpg = isSyuumatu || isJuttenKyokusei;
+  return isJpg ? 'jpg' : 'png';
+}
+
+interface Props extends HTMLAttributes<'button'> {
+  modalID: string; //MainModalBody と同じ文字列でなければならない
+  category: CategoryData;
+}
+const { class: className, modalID, category } = Astro.props;
+const format = _createFormat(category.name);
+---
+
+<MainModalBtn
+  modalID={modalID}
+  class:list={[
+    className,
+    css({
+      radius: '2px',
+      bgColor: '{colors.bg}',
+      bo: '1px solid {colors.bg}',
+      overflow: 'hidden',
+      boxShadow: '1px 1px 4px #000',
+      pos: 'relative'
+    })
+  ]}>
+  <Image
+    src={`/images/modal/${category.name}.${format}`}
+    width={600}
+    height={315}
+    alt={category.label}
+    class={css({ w: '100%', h: '100%', aspectRatio: '600/315' })}
+  />
+  <span class={css({ pos: 'absolute', left: 0, bottom: 0, zIndex: 1 })}>
+    <CategoryLabel
+      as="span"
+      category={category}
+      class={css({ fontSize: '.75rem' })}
+    />
+  </span>
+</MainModalBtn>

@@ -1,0 +1,68 @@
+---
+import type { ComponentProps } from 'astro/types';
+import type { SettingTypeName } from 'src/assets/data/common';
+import ContentsLabel from 'src/components/ContentsLabel.astro';
+import RequiredTreasureModal from 'src/components/contents-chart/RequiredTreasureModal.astro';
+import type { RequiredTreasureData, TreasuresData, TreasureSorts } from 'src/helpers/createContentsData';
+import validTreasureSorts from 'src/helpers/validTreasureSorts';
+
+interface Props extends ComponentProps<typeof ContentsLabel> {
+  settingTypeName?: SettingTypeName;
+  allRequiredTreasures: RequiredTreasureData[];
+  treasureSorts: TreasureSorts[string];
+  modalLabel?: string;
+}
+const { content, allRequiredTreasures, treasureSorts, settingTypeName, modalLabel } = Astro.props;
+const preAccuedTreasures = preAccu(allRequiredTreasures);
+validTreasureSorts(preAccuedTreasures, treasureSorts);
+
+type AccuTreasures = { [key: string]: TreasuresData[number] };
+function preAccu(allRequiredTreasures: RequiredTreasureData[]) {
+  const allTreasures = _extractTreasures(allRequiredTreasures);
+
+  const preAccued = allTreasures.reduce((accu, treasure, i) => {
+    const { name, isSetting, whose, number, swapNumber, noAccu } = treasure;
+    if (noAccu) return accu;
+    const isAccu = !isSetting && !whose && !swapNumber;
+    if (isAccu) {
+      const accuKey = `${name}_accu`;
+      const accued = accu[accuKey];
+      if (!accued) {
+        return { ...accu, [accuKey]: treasure };
+      }
+      const accuedNumber = accued.number + number;
+      const newAccu = {
+        [accuKey]: {
+          ...treasure,
+          number: accuedNumber
+        }
+      };
+      return { ...accu, ...newAccu };
+    }
+    return { ...accu, [`${name}_${i}`]: treasure };
+  }, {} as AccuTreasures);
+  return Object.values(preAccued);
+}
+
+function _extractTreasures(allRequiredTreasures: RequiredTreasureData[]) {
+  return allRequiredTreasures.reduce((accu, requiredTreasureData) => {
+    const { treasures } = requiredTreasureData;
+    if (!treasures) return accu;
+    accu = [...accu, ...treasures];
+    return accu;
+  }, [] as TreasuresData);
+}
+---
+
+<!-- <ConsoleObject data={preAccuedTreasures} /> -->
+<RequiredTreasureModal
+  modalID="all"
+  content={content}
+  treasures={preAccuedTreasures}
+  swapContentTarget={true}
+  modalLabel={modalLabel ?? '全ての必要素材'}
+  isPlaneModalLabel={true}
+  treasureSorts={treasureSorts}
+  settingTypeName={settingTypeName}
+  isAccu={true}
+/>

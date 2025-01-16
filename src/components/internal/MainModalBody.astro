@@ -1,0 +1,138 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { css } from 'styled-system/css';
+import type { SystemStyleObject } from 'styled-system/types';
+
+interface Props extends HTMLAttributes<'dialog'> {
+  modalID: string;
+  isRightPos?: boolean;
+  is2ColumnMode?: boolean;
+}
+const { class: className, modalID, isRightPos, is2ColumnMode } = Astro.props;
+
+const closeIconStyles: SystemStyleObject = {
+  content: '""',
+  d: 'block',
+  w: '100%',
+  h: '2px',
+  bgColor: '{colors.text}',
+  radius: '4px',
+  pos: 'absolute',
+  top: '50%',
+  left: '50%',
+  translate: '-50% -50%'
+};
+const shadowProp = '0px 1px 4px #000';
+const posStyles: SystemStyleObject = {
+  right: isRightPos ? 0 : undefined,
+  left: isRightPos ? undefined : 0,
+  pos: 'fixed',
+  top: 0,
+  zIndex: 10
+};
+---
+
+<dialog
+  id={`${modalID}-modal-body`}
+  data-main-modal-body
+  class:list={[
+    className,
+    is2ColumnMode ? css({ _base: posStyles }) : css(posStyles),
+    css({
+      // w: 'calc(100% - 1rem)',
+      // w: 'calc(100% - 1rem)',
+      // minW: '320px',
+      // maxW: '468px',
+      w: 'clamp(320px, calc(100% - 1rem), 468px)',
+      h: '100svh',
+      bgColor: '{colors.bg}',
+      boxShadow: is2ColumnMode ? 'none' : '0 2px 4px #000',
+      '&::backdrop': {
+        bgColor: 'rgba(0, 0, 0, .5)'
+      },
+
+      //scroll styles
+      overscrollBehaviorY: 'none',
+      containerName: 'modal',
+      overflowY: 'auto',
+      '@supports selector(::-webkit-scrollbar)': {
+        '&::-webkit-scrollbar': {
+          w: '.5rem',
+          bgColor: '{colors.bg}'
+        },
+        '&::-webkit-scrollbar-thumb': {
+          w: '.5rem',
+          bgColor: '{colors.gray}',
+          radius: '100px'
+          // bo: '1px solid {colors.bg}'
+        }
+      },
+      '@supports not selector(::-webkit-scrollbar)': {
+        scrollbarWidth: 'thin',
+        scrollbarColor: '{colors.bg} {colors.gray}'
+      }
+    })
+  ]}>
+  <div
+    class={css(is2ColumnMode && { tab: { d: 'none' } }, {
+      //閉じるボタン
+      w: 'fit-content',
+      h: 0,
+      pos: 'sticky',
+      top: 0,
+      left: '100%',
+      zIndex: 100
+    })}>
+    <button
+      data-main-modal-close
+      aria-label="メニューを閉じる"
+      type="button"
+      class={css({
+        bgColor: '{colors.gray}',
+        bo: '1px solid {colors.cancel}',
+        pd: '.375rem .5rem .5rem .875rem',
+        radius: '0 0 0 100px',
+        boxShadow: `${shadowProp}, inset 0 0 3px {colors.cancel}`
+      })}>
+      <span
+        class={css({
+          d: 'block',
+          w: '1.25rem',
+          aspectRatio: '1/1',
+          pos: 'relative',
+          '&::before': {
+            ...closeIconStyles,
+            rotate: '45deg'
+          },
+          '&::after': {
+            ...closeIconStyles,
+            rotate: '-45deg'
+          }
+        })}></span>
+    </button>
+  </div>
+  <slot />
+</dialog>
+
+<script>
+  const dialogDOMs: NodeListOf<HTMLDialogElement> = document.querySelectorAll('[data-main-modal-body]');
+  const openBtnDOMs: NodeListOf<HTMLButtonElement> = document.querySelectorAll('[data-main-modal-btn]');
+
+  //open
+  openBtnDOMs.forEach(openBtnDOM => {
+    openBtnDOM.addEventListener('click', e => {
+      const target = e.currentTarget as HTMLButtonElement;
+      const modalBtnID = target.getAttribute('id')?.split('-btn')[0];
+      const modalBodyDOM = Array.from(dialogDOMs).find(dialogDOM => {
+        const modalBodyID = dialogDOM.getAttribute('id')?.split('-body')[0];
+        return modalBodyID === modalBtnID;
+      });
+      modalBodyDOM?.showModal();
+    });
+  });
+  //close
+  dialogDOMs.forEach(dialogDOM => {
+    const closeBtnDOM = dialogDOM.querySelector('[data-main-modal-close]');
+    closeBtnDOM?.addEventListener('click', () => dialogDOM.close());
+  });
+</script>

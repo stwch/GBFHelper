@@ -1,0 +1,57 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import MainModalBtn from 'src/components/internal/MainModalBtn.astro';
+import { css } from 'styled-system/css';
+import type { SystemStyleObject } from 'styled-system/types';
+
+interface Props extends HTMLAttributes<'button'> {}
+const { class: className } = Astro.props;
+const lineStyle: SystemStyleObject = {
+  content: '""',
+  d: 'block',
+  w: '100%',
+  h: '2px',
+  bgColor: '{colors.text}',
+  radius: '2px'
+};
+---
+
+<MainModalBtn
+  modalID="menu"
+  aria-label="メニューを開く"
+  class:list={[
+    className,
+    css({
+      pos: 'fixed',
+      right: '0',
+      top: '0',
+      zIndex: '100',
+
+      // bottom: '0',
+      bgColor: '{colors.gray}',
+      radius: '0 0 0 100px',
+      // radius: '100px 0 0 0',
+      bo: '1px solid {colors.ok}',
+      boxShadow: '0px 0px 4px rgba(0, 0, 0, .5)'
+    })
+  ]}>
+  <span
+    class={css({
+      d: 'grid',
+      gridTemplateRows: 'repeat(3, auto)',
+      rowGap: '.375rem',
+      pd: '.375rem .25rem .875rem .875rem',
+      // pd: '.75rem .25rem .25rem .875rem',
+      radius: '100px',
+      '&::before': lineStyle,
+      '&::after': lineStyle
+    })}>
+    <span
+      class={css({
+        w: '1.5rem',
+        h: '2px',
+        radius: '100px',
+        bgColor: '{colors.text}'
+      })}></span>
+  </span>
+</MainModalBtn>

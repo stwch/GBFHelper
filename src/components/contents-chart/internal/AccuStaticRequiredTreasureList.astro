@@ -1,0 +1,52 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import RequiredTreasureBtnReact from 'src/components/contents-chart/internal/RequiredTreasureBtnReact';
+import type { TreasuresData, TreasureSorts } from 'src/helpers/createContentsData';
+import sortTreasures from 'src/helpers/sortTreasures';
+import { css } from 'styled-system/css';
+
+interface Props extends HTMLAttributes<'ul'> {
+  treasures: TreasuresData;
+  treasureSorts: TreasureSorts[string] | undefined;
+}
+const { class: className, treasures, treasureSorts } = Astro.props;
+
+const accuedTreasures = _accuTreasures(treasures);
+const sorted = sortTreasures(accuedTreasures, treasureSorts);
+
+interface AccuedTreasure {
+  [key: string]: TreasuresData[number];
+}
+function _accuTreasures(treasures: TreasuresData) {
+  const accuedTreasures = treasures.reduce((accu, treasure) => {
+    const { name, number } = treasure;
+    const existingAcuu = accu[name];
+    if (!existingAcuu) {
+      const newEntry = { ...treasure, number };
+      return { ...accu, [name]: newEntry };
+    }
+    const accuedNumber = existingAcuu.number + number;
+    const accuedTreasure = { ...treasure, number: accuedNumber };
+    return { ...accu, [name]: accuedTreasure };
+  }, {} as AccuedTreasure);
+  return Object.values(accuedTreasures);
+}
+---
+
+{
+  sorted.map(treasures => {
+    return (
+      <ul class:list={[className, css({ '&+&': { mt: '1rem' } })]}>
+        {treasures.map(treasure => {
+          return (
+            <RequiredTreasureBtnReact
+              client:idle
+              as="li"
+              treasure={treasure}
+            />
+          );
+        })}
+      </ul>
+    );
+  })
+}

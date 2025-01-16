@@ -1,0 +1,236 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { Image } from 'astro:assets';
+import MainModalBody from 'src/components/internal/MainModalBody.astro';
+import MainVisual from 'src/components/MainVisual.astro';
+import createFeatureData, { featureNames } from 'src/helpers/createFeatureData';
+import { css } from 'styled-system/css';
+import type { SystemStyleObject } from 'styled-system/types';
+
+interface Props extends HTMLAttributes<'dialog'> {
+  viewAd?: boolean;
+}
+const { class: className, viewAd } = Astro.props;
+const lineStyle: SystemStyleObject = {
+  content: '""',
+  d: 'block',
+  w: '1.125rem',
+  h: '2px',
+  bgColor: '{colors.text}',
+  radius: '100px'
+};
+featureNames;
+const currentPath = Astro.url.pathname;
+const requiredTreasurePathReg = /\/contents-chart\/./;
+const isRequiredTreasureUnder = requiredTreasurePathReg.test(currentPath);
+const requiredTreasureFeatureData = createFeatureData('contents_chart');
+
+const spaceTotalRem = '4.75rem';
+// const spaceTotalRem = '6.75rem';//AD のspace も含めた値
+---
+
+<MainModalBody
+  modalID="menu"
+  isRightPos={true}
+  is2ColumnMode={true}
+  class:list={[className, css({ maxW: '{sizes.maxSp}' })]}>
+  <nav>
+    <div
+      class={css({
+        pos: 'sticky',
+        top: 0,
+        left: 0,
+        zIndex: 10
+      })}>
+      <p
+        class={css({
+          d: 'grid',
+          gridTemplateColumns: 'auto auto',
+          columnGap: '.25rem',
+          justifyContent: 'start',
+          alignItems: 'center',
+          bgColor: '{colors.gray}',
+          fontSize: '.875rem',
+          fontWeight: '600',
+          pd: '.125rem 1.25rem .125rem .25rem',
+          pos: 'relative',
+          zIndex: 1,
+          '&::before': {
+            content: '""',
+            d: 'block',
+            bgImage: 'url(/images/bg-pattern-dark.png)',
+            opacity: '0.2',
+            bgSize: 'contain',
+            pos: 'absolute',
+            inset: 0,
+            zIndex: '-1'
+          }
+        })}>
+        <span
+          class={css({
+            //3本の線
+            d: 'grid',
+            gridTemplateRows: 'repeat(3, auto)',
+            rowGap: '.25rem',
+            '&::before': lineStyle,
+            '&::after': lineStyle
+          })}>
+          <span
+            class={css({
+              w: '1.125rem',
+              h: '2px',
+              radius: '100px',
+              bgColor: '{colors.text}'
+            })}></span>
+        </span>
+        Menu
+      </p>
+    </div>
+    <div class={css({ minH: `calc(100svh - ${spaceTotalRem})` })}>
+      {
+        isRequiredTreasureUnder && (
+          <ul
+            class={css({
+              pt: '{spacing.row.section}',
+              px: '1rem',
+              pos: 'relative',
+              '&::after': {
+                //セパレーター
+                content: "''",
+                d: 'block',
+                w: '100%',
+                h: '1px',
+                bgColor: '{colors.gray}',
+                mt: '{spacing.row.section}',
+                op: '0.2'
+              }
+            })}>
+            <li>
+              <a
+                href="/contents-chart#select"
+                class={css({
+                  d: 'block',
+                  overflow: 'hidden',
+                  radius: '2px',
+                  boxShadow: '2px 2px 4px #000',
+                  bo: '1px solid {colors.gray}'
+                })}>
+                <span
+                  class={css({
+                    d: 'grid',
+                    alignItems: 'end',
+                    w: '100%',
+                    aspectRatio: '2/1',
+                    bgColor: '{colors.bg}',
+                    pos: 'relative',
+                    '&::before': {
+                      //背景
+                      content: '""',
+                      d: 'block',
+                      pos: 'absolute',
+                      inset: 0,
+                      bgImage: 'url(/images/bg-pattern-light.png)',
+                      bgSize: '50%',
+                      filter: 'opacity(7%)'
+                    }
+                  })}>
+                  <Image
+                    src={`/images/${requiredTreasureFeatureData.imagePath}`}
+                    alt={requiredTreasureFeatureData.alt}
+                    width={640}
+                    height={628}
+                    class={css({
+                      w: '100%',
+                      transform: 'scaleX(-1)',
+                      pos: 'absolute',
+                      top: '-25%'
+                    })}
+                  />
+                  <span
+                    class={css({
+                      d: 'block',
+                      pd: '.125rem .25rem',
+                      fontWeight: 700,
+                      fontSize: '.875rem',
+                      bgColor: '{colors.gray}',
+                      pos: 'relative',
+                      '&::before': {
+                        //背景
+                        content: '""',
+                        d: 'block',
+                        pos: 'absolute',
+                        inset: 0,
+                        bgImage: 'url(/images/bg-pattern-dark.png)',
+                        bgSize: 'contain',
+                        opacity: '0.2'
+                      }
+                    })}>
+                    コンテンツ選択画面へ
+                  </span>
+                </span>
+              </a>
+            </li>
+          </ul>
+        )
+      }
+      <ul
+        class={css({
+          pd: '{spacing.row.section} 1rem',
+          '& > li+li': { mt: '{spacing.row.section}' }
+        })}>
+        {
+          featureNames.map(featureName => {
+            const featureData = createFeatureData(featureName);
+            const isTop = featureName === 'top';
+            const pathName = isTop ? '' : featureName.replaceAll('_', '-');
+            const pathReg = new RegExp(pathName);
+            const isCurrent = isTop ? currentPath === '/' : pathReg.test(currentPath);
+            return (
+              !isCurrent && (
+                <li>
+                  <a
+                    href={`/${pathName}`}
+                    class={css({
+                      d: 'block',
+                      overflow: 'hidden',
+                      boxShadow: '2px 2px 4px #000',
+                      radius: '2px',
+                      bo: '1px solid {colors.gray}'
+                    })}>
+                    <MainVisual
+                      featureName={featureName}
+                      isUnderSection={true}
+                    />
+                    <span
+                      class={css({
+                        d: 'block',
+                        bgColor: '{colors.gray}',
+                        fontSize: '.875rem',
+                        fontWeight: '700',
+                        pd: '.125rem .25rem',
+                        pos: 'relative',
+                        zIndex: 1,
+                        '&::before': {
+                          content: '""',
+                          d: 'block',
+                          bgImage: 'url(/images/bg-pattern-dark.png)',
+                          opacity: '0.2',
+                          bgSize: 'contain',
+                          pos: 'absolute',
+                          inset: 0,
+                          zIndex: '-1'
+                        }
+                      })}>
+                      {isTop ? 'トップ' : featureData.title}へ
+                    </span>
+                  </a>
+                </li>
+              )
+            );
+          })
+        }
+      </ul>
+    </div>
+    <!-- {viewAd && <BasicAdReact client:only="react" />} -->
+  </nav>
+</MainModalBody>

@@ -1,0 +1,86 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { Image } from 'astro:assets';
+import { css } from 'styled-system/css';
+
+type Props<Tag extends HTMLTag> = Polymorphic<{
+  as: Tag;
+  label?: string;
+  isDark?: boolean;
+  processIndex?: number;
+}>;
+
+const { class: className, as: Tag = 'div', label, processIndex, isDark } = Astro.props;
+const bgColorProp = isDark ? '{colors.bg}' : '{colors.gray}';
+const bgImageProp = isDark ? 'url(/images/bg-pattern-light.png)' : 'url(/images/bg-pattern-dark.png)';
+// const indexBgColorProp = isDark ? '{colors.gray}' : '{colors.bg}';
+// const indexColorProp = isDark ? '{colors.bg}' : '{colors.gray}';
+---
+
+<Tag
+  class:list={[
+    className,
+    css({
+      d: 'grid',
+      gridTemplateColumns: 'auto auto',
+      columnGap: '.25rem',
+      alignItems: 'start',
+      justifyContent: 'start',
+      color: isDark ? '{colors.gray}' : undefined,
+      bgColor: bgColorProp,
+      fontSize: '.875rem',
+      fontWeight: '700',
+      // lineHeight: 1,
+      // pd: '.25rem 3rem .25rem .25rem',
+      pr: '3rem',
+      // px: '.25rem 3rem',
+      pos: 'relative',
+      zIndex: 1,
+      '&::before': {
+        content: '""',
+        d: 'block',
+        bgImage: bgImageProp,
+        opacity: '0.15',
+        bgSize: 'contain',
+        pos: 'absolute',
+        inset: 0,
+        zIndex: '-1'
+      }
+    })
+  ]}>
+  {
+    processIndex ? (
+      <span
+        class={css({
+          d: 'block',
+          // placeItems: 'center',
+          // justifyContent: 'center',
+          // w: '1rem',
+          // mt: '2px',
+          pt: '.5rem',
+          px: '.5rem',
+          lineHeight: 1,
+          // aspectRatio: '1/1',
+          // radius: '100px',
+          radius: '1px',
+          h: '100%',
+          fontSize: '.875rem',
+          br: '1px solid {colors.bg}'
+          // bgColor: indexBgColorProp,
+          // color: indexColorProp
+        })}>
+        {processIndex}
+      </span>
+    ) : (
+      <Image
+        class={css({ h: '1.25rem', mt: '.25rem' })}
+        src={`/images/icon/category/treasure.png`}
+        alt={`トレジャーのアイコン`}
+        width={48}
+        height={48}
+      />
+    )
+  }
+  {label ? <span class={css({ d: 'block', py: '.25rem' })}>{label}</span> : <slot />}
+  <!-- {label ? label : <slot />} -->
+</Tag>

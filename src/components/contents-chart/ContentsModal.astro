@@ -1,0 +1,45 @@
+---
+import type { ComponentProps } from 'astro/types';
+import CategoryLabel from 'src/components/internal/CategoryLabel.astro';
+import MainModalBody from 'src/components/internal/MainModalBody.astro';
+import PReact from 'src/components/PReact';
+import type { CategoryData } from 'src/helpers/createContentsData';
+import { css } from 'styled-system/css';
+
+interface Props extends ComponentProps<typeof MainModalBody> {
+  category: CategoryData;
+}
+const { class: className, modalID, category } = Astro.props;
+
+const shadowProp = '0px 1px 4px #000';
+---
+
+<MainModalBody
+  modalID={modalID}
+  class:list={[className, css({ maxW: '468px' })]}>
+  <section>
+    <div
+      class={css({
+        pos: 'sticky',
+        top: 0,
+        zIndex: 10
+      })}>
+      <CategoryLabel
+        as="h3"
+        category={category}
+        isBottomRightRadius={true}
+        class={css({
+          fontSize: '.875rem',
+          boxShadow: shadowProp
+        })}
+      />
+    </div>
+    <PReact className={css({ color: '{colors.gray}', pt: '{spacing.row.section}', pl: '1rem' })}>
+      サムネイルを押すと、データ画面へ移動します。
+    </PReact>
+    <div class={css({ pd: '{spacing.row.section} 1rem' })}>
+      <slot />
+    </div>
+    <slot name="visual" />
+  </section>
+</MainModalBody>

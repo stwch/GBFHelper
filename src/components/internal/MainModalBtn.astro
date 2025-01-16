@@ -1,0 +1,23 @@
+---
+import type { ComponentProps, HTMLAttributes } from 'astro/types';
+import IsWrap from 'src/components/IsWrap.astro';
+import type { Merge } from 'type-fest';
+
+interface Props extends Merge<HTMLAttributes<'button'>, ComponentProps<typeof IsWrap>> {
+  modalID: string; //MainModalBody と同じ文字列でなければならない
+}
+const { class: className, modalID, as = 'div', isWrap, ...btnAttr } = Astro.props;
+---
+
+<IsWrap
+  as={as}
+  isWrap={isWrap}>
+  <button
+    {...btnAttr}
+    data-main-modal-btn
+    id={`${modalID}-modal-btn`}
+    type="button"
+    class={className}>
+    <slot />
+  </button>
+</IsWrap>
