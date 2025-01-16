@@ -33,8 +33,8 @@ export function subfont(): AstroIntegration {
         //     `subfont ${filePath} -i --formats woff2 --root ${distDirPath} --no-fallbacks --inline-css -o ./dist`
         //   );
         // });
-      }
-    }
+      },
+    },
   };
 }
 
@@ -42,7 +42,7 @@ function _fix404PagePath(distDirPath: string, pagePathName: string) {
   const is404Page = pagePathName.match('404');
   const path = is404Page ? '404.html' : pagePathName + 'index.html';
   // return distDirPath + path;
-  return './dist/' + path;
+  return 'dist/' + path;
 }
 
 // export function subfont(): AstroIntegration {
