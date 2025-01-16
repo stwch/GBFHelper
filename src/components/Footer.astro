@@ -15,15 +15,15 @@ const { class: className } = Astro.props;
       radius: '4px',
       bgColor: '#555',
       pd: '1rem',
-      color: '{colors.gray}'
-    })
+      color: '{colors.gray}',
+    }),
   ]}>
   <SiteTitle
     as="span"
     class={css({ fontSize: '2rem', mb: '{spacing.row.p}' })}
   />
   <a
-    href="https://x.com/web_holic_"
+    href="https://x.com/gbf_holic"
     class={css({
       d: 'grid',
       placeItems: 'center',
@@ -32,11 +32,12 @@ const { class: className } = Astro.props;
       bgColor: '#000',
       pd: '.25rem',
       radius: '2px',
-      mb: '{spacing.row.p}'
+      mb: '{spacing.row.p}',
     })}>
     <Image
       class={css({
-        d: 'block'
+        d: 'block',
+        w: '100%',
       })}
       src="/images/icon/x-logo.svg"
       alt="X ロゴ"
