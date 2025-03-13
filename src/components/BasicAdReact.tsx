@@ -8,15 +8,6 @@ interface Props extends React.ComponentPropsWithoutRef<'div'> {
 }
 export default function ({ className }: Props) {
   const { isRemove } = useAdStore();
-  // const adBoxRef = useRef<HTMLDivElement>(null);
-
-  // useEffect(() => {
-  //   const adBoxDOM = adBoxRef.current;
-  //   if (adBoxDOM) {
-  //     const adScriptDOM = createAdScreptDOM();
-  //     adBoxDOM.appendChild(adScriptDOM); //広告をレンダリングする
-  //   }
-  // }, [isRemove]);
 
   return (
     <div
@@ -30,8 +21,8 @@ export default function ({ className }: Props) {
           bottom: 0,
           zIndex: 1000,
           minH: '50px',
-          mt: '2rem'
-        })
+          mt: '2rem',
+        }),
       )}
       style={{ display: isRemove ? 'none' : undefined }}>
       <SubModalBtnReact
@@ -53,17 +44,16 @@ export default function ({ className }: Props) {
             w: '2rem',
             aspectRatio: '1/1',
             bgImage: 'url(/images/icon/ui/ad-remove.svg)',
-            bgSize: '100%'
-          }
+            bgSize: '100%',
+          },
         })}
       />
       <div
-        // ref={adBoxRef}
         className={css({
           d: 'grid',
           justifyContent: 'end',
           bgColor: 'rgba(0, 0, 0, .5)',
-          backdropFilter: 'blur(2px)'
+          backdropFilter: 'blur(2px)',
         })}>
         <AdmaxReact id="daf18ae5ecbb9592d00b07f489a345db" />
       </div>

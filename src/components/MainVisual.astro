@@ -13,6 +13,7 @@ interface Props extends Omit<ComponentProps<typeof FeatureVisual>, 'title'> {
 const { class: className, featureName, isUnderSection } = Astro.props;
 if (!featureName) throw Error(`props「featureName」が必須`);
 const feature = createFeatureData(featureName);
+const featureImg = getAstroImageFunction(feature.imagePath)();
 ---
 
 <FeatureVisual
@@ -25,9 +26,9 @@ const feature = createFeatureData(featureName);
         class={css({
           pos: 'absolute',
           top: '0%',
-          right: '-30%'
+          right: '-30%',
         })}
-        src={getAstroImageFunction(feature.imagePath)()}
+        src={featureImg}
         alt={feature.alt}
       />
     )
@@ -39,9 +40,9 @@ const feature = createFeatureData(featureName);
           pos: 'absolute',
           top: '-10%',
           right: '-30%',
-          transform: 'scale(-1, 1)'
+          transform: 'scale(-1, 1)',
         })}
-        src={getAstroImageFunction(feature.imagePath)()}
+        src={featureImg}
         alt={feature.alt}
       />
     )
@@ -55,7 +56,7 @@ const feature = createFeatureData(featureName);
           scale: '1.5',
           transform: 'translateY(5%)'
         })}
-        src={getAstroImageFunction(feature.imagePath)()}
+        src={featureImg}
         alt={feature.alt}
       />
     )

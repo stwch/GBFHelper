@@ -7,7 +7,6 @@ import { css } from 'styled-system/css';
 
 interface Props extends React.ComponentPropsWithoutRef<'dialog'> {}
 export default function ({}: Props) {
-  // const adBoxRef = useRef<HTMLDivElement>(null);
   const [isClicked, setClicked] = useState(false);
   return (
     <SubModalReact
@@ -18,7 +17,7 @@ export default function ({}: Props) {
           color: '{colors.gray}',
           px: '1rem',
           textAlign: 'center',
-          mb: '{spacing.row.section}'
+          mb: '{spacing.row.section}',
         })}>
         {isClicked ? (
           <PReact>
@@ -47,14 +46,14 @@ export default function ({}: Props) {
               bo: '1px solid {colors.ok}',
               radius: '2px',
               mx: 'auto',
-              mb: '{spacing.row.p}'
+              mb: '{spacing.row.p}',
             })}>
             バナー広告を表示して広告枠を削除
           </button>
           <PReact
             className={css({
               color: '{colors.gray}',
-              textAlign: 'center'
+              textAlign: 'center',
             })}>
             ・アダルト広告は表示されません。
             <br />
@@ -64,13 +63,10 @@ export default function ({}: Props) {
       )}
 
       <div
-        // ref={adBoxRef}
         className={css({
           my: '2rem',
           d: 'grid',
-          justifyContent: 'center'
-          // minW: '300px',
-          // minH: '250px'
+          justifyContent: 'center',
         })}
         style={{ display: isClicked ? undefined : 'none' }}>
         <AdmaxReact id="b7af2404cb763bb43462279c0a9cd789" />
@@ -78,11 +74,3 @@ export default function ({}: Props) {
     </SubModalReact>
   );
 }
-
-// function _renderAd(adBoxRef: React.RefObject<HTMLDivElement>) {
-//   const adBoxDOM = adBoxRef.current;
-//   if (adBoxDOM) {
-//     const adScriptDOM = createAdScreptDOM({ isRemoveAd: true });
-//     adBoxDOM.appendChild(adScriptDOM); //広告をレンダリングする
-//   }
-// }
