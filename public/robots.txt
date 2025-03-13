@@ -9,8 +9,6 @@ Disallow: /
 
 User-agent: *
 Allow: /
-
-User-agent: *
-Crawl-delay: 86,400
+Crawl-delay: 10
 
 Sitemap: https://gbf-helper.com/sitemap-index.xml
