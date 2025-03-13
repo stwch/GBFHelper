@@ -1,7 +1,4 @@
 ---
-import AdRemoveMenuReact from 'src/components/AdRemoveMenuReact';
-import BasicAdReact from 'src/components/BasicAdReact';
-import CheckRemoveAd from 'src/components/CheckRemoveAd';
 import Footer from 'src/components/Footer.astro';
 import MenuBody from 'src/components/MenuBody.astro';
 import MenuBtn from 'src/components/MenuBtn.astro';
@@ -18,9 +15,10 @@ interface Props {
 const { title, mainClassName, is404, description } = Astro.props;
 const separatorW = '3rem';
 
-const { pathname } = Astro.url;
-const isPrivacypolicy = pathname.includes('privacypolicy');
-const viewAd = !isPrivacypolicy && !is404;
+// AD
+// const { pathname } = Astro.url;
+// const isPrivacypolicy = pathname.includes('privacypolicy');
+// const viewAd = !isPrivacypolicy && !is404;
 
 //メインヴィジュアルのプリロード（Lighthouse で注意されるので実装したが、体感だと遅く感じるので保留）
 // const pathName = Astro.url.pathname;
@@ -43,7 +41,7 @@ const viewAd = !isPrivacypolicy && !is404;
   lang="ja"
   class={css({
     scrollBehavior: 'smooth',
-    '&:has(dialog[open])': { overflow: 'hidden' }
+    '&:has(dialog[open])': { overflow: 'hidden' },
   })}>
   <head>
     <meta charset="UTF-8" />
@@ -100,7 +98,7 @@ const viewAd = !isPrivacypolicy && !is404;
       fontSize: '16px',
       fontWeight: 400,
       lineHeight: 1.5,
-      textAlign: 'justify'
+      textAlign: 'justify',
     })}>
     <MenuBtn
       class={css({
@@ -115,10 +113,10 @@ const viewAd = !isPrivacypolicy && !is404;
             pr: '.25rem',
             fontSize: '.75rem',
             fontWeight: '700',
-            lineHeight: 1
-          }
+            lineHeight: 1,
+          },
         },
-        tab: { d: 'none' }
+        tab: { d: 'none' },
       })}
     />
     <div
@@ -126,11 +124,11 @@ const viewAd = !isPrivacypolicy && !is404;
         tab: {
           d: 'grid',
           gridTemplateColumns: `minmax(320px, 468px) ${separatorW} minmax(320px, 468px)`,
-          justifyContent: 'start'
-        }
+          justifyContent: 'start',
+        },
       })}>
       <MenuBody
-        viewAd={viewAd}
+        viewAd={false}
         class={css({ tab: { pos: 'sticky', top: 0, left: 0, d: 'block', order: 3 } })}
       />
       <div
@@ -154,32 +152,32 @@ const viewAd = !isPrivacypolicy && !is404;
               bgImage: 'url(/images/bg-pattern-light.png)',
               bgSize: '6rem',
               bgPos: 'center',
-              opacity: '0.15'
-            }
+              opacity: '0.15',
+            },
           },
           pc: {
             w: '3rem',
             '&::before': {
-              bgSize: '6rem'
-            }
-          }
+              bgSize: '6rem',
+            },
+          },
         })}>
       </div>
       <slot name="before-main" />
       <main class={mainClassName}>
         <slot />
-        {viewAd && <BasicAdReact client:only="react" />}
+        <!-- {viewAd && <BasicAdReact client:only="react" />} -->
       </main>
       <slot name="after-main" />
     </div>
-    {
+    <!-- {
       viewAd && (
         <>
           <AdRemoveMenuReact client:only="react" />
           <CheckRemoveAd client:only="react" />
         </>
       )
-    }
+    } -->
   </body>
   <slot name="after-body" />
   <Footer class={css({ mt: '4rem' })} />
